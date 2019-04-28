@@ -3356,3 +3356,79 @@ ts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/public/amsfonts/cm/cmti12.pfb>
 Output written on essay/tex/essay.pdf (6 pages, 56328 bytes).
 Transcript written on essay/tex/essay.log.
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./essay.tex
+LaTeX2e <2017-04-15>
+Babel <3.18> and hyphenation patterns for 3 language(s) loaded.
+(/home/cole/texmf/tex/latex/base/article.cls
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+(/home/cole/texmf/tex/latex/base/size12.clo))
+(/home/cole/texmf/tex/latex/geometry/geometry.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifpdf.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifvtex.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty))
+(/home/cole/texmf/tex/latex/setspace/setspace.sty)
+(/home/cole/texmf/tex/latex/quoting/quoting.sty
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifluatex.sty)))))
+(/home/cole/texmf/tex/latex/microtype/microtype.sty
+(/home/cole/texmf/tex/latex/microtype/microtype-pdftex.def)
+(/home/cole/texmf/tex/latex/microtype/microtype.cfg))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/wasysym/wasysym.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/hyperref.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty))
+(tex/essay.aux)
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+(/home/cole/texmf/tex/latex/microtype/mt-cmr.cfg)
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/grfext.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
+(tex/essay.out) (tex/essay.out)
+Underfull \hbox (badness 10000) in paragraph at lines 20--32
+
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] [4] [5]
+Underfull \hbox (badness 10000) in paragraph at lines 33--35
+
+[6] (tex/essay.aux) )
+(see the transcript file for additional information)</usr/share/texlive/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmti12.pfb>
+Output written on tex/essay.pdf (6 pages, 57295 bytes).
+Transcript written on tex/essay.log.
