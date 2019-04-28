@@ -1,0 +1,35 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage[leftmargin = 1in, rightmargin = 0in, vskip = 0in]{quoting}
+\usepackage{microtype}
+\usepackage{amssymb, amsthm, amsmath, amsfonts}
+\usepackage{ wasysym }
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{hyperref}
+\newcommand{\blockquotespacing}{\blockspaced}
+\newcommand{\prose}{.25in}
+\newcommand{\poetry}{0in}
+\newcommand{\singlespaced}{\setstretch{1}\vspace{\baselineskip}}
+\newcommand{\blockspaced}{\setstretch{1.3}\vspace{\baselineskip}}
+\newcommand{\doublespaced}{}
+\newenvironment{blockquote}[1][\prose]{\setlength{\parindent}{#1}\begin{quoting}\blockquotespacing}{\end{quoting}}
+\begin{document}
+\setstretch{2}
+\raggedright
+{\Huge Header!}\\
+Some stuff I'm saying\\
+{\large AHHHHH smaller boi}\\
+\textbf{Bold stuff} or \textit{italic stuff} \href{https://www.colehollant.com}{this guy is a link} askihdasd and \href{https://www.colehollant.com/OOP}{some other link} still followed by \textit{italics} and maybe also \textbf{more bold things}\\
+Testing multiple \textbf{bold things} in some \textbf{given line} ya know?\\
+{\large Bullet}\\
+\begin{itemize} \item one thing\end{itemize}
+\begin{itemize} \item two thing\end{itemize}
+{\large Order}\\
+\begin{enumerate} \setcounter{enumi}{0} \item one thing\end{enumerate}
+\begin{enumerate} \setcounter{enumi}{1} \item two thing\end{enumerate}
+{\LARGE Math Mode!}\\
+When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) and they are\\
+$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$\\
+\end{document}
