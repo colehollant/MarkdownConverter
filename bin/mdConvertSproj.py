@@ -13,12 +13,47 @@ import sys
 
 htmlLines = []
 texLines = []
-# dirname = "test"
-# mdname = dirname+"/"+dirname+".md"
-# htmlname = dirname+"/"+dirname+".html"
-# cssname = dirname+"/"+"markdown.css"
-# texname = dirname+"/"+dirname+".tex"
 inCodeBlock = False
+inCommentBlock = False
+mustFinishComment = False
+
+markdownToTexLangs= {
+"apache": "sh",
+"applescript": "C++",
+"c": "C",
+"cmake": "make",
+"cpp": "C++",
+"c++": "C++",
+"cs": "C++",
+"csharp": "C++",
+"css": "XML",
+"bash": "bash",
+"http": "XML",
+"html": "HTML",
+"java": "Java",
+"javascript": "Java",
+"json": "Python",
+"go": "Go",
+"jsx": "XML",
+"less": "bash",
+"make": "make",
+"matlab": "Matlab",
+"objectivec": "C++",
+"pascal": "Pascal",
+"php": "XML",
+"perl": "Perl",
+"python": "Python",
+"py": "Python",
+"sh": "sh",
+"sql": "SQL",
+"scss": "XML",
+"svg": "XML",
+"swift": "C++",
+"rb": "Ruby",
+"ruby": "Ruby",
+"vue": "XML",
+"xml": "XML"
+}
 
 
 ###############################################################################
@@ -82,7 +117,6 @@ def processNewPageHTML(line):
     newLine = ""
     if line.startswith("@@N"):
         isNewLine = True
-        # newLine = "<div class=\"newpage\"></div>" #this gives whitespace
         newLine = "</div><div class=\"markdown\">"  #this gives break
     return isNewLine, newLine
 
@@ -215,13 +249,13 @@ def checkHeaderTex(line):
                 num+=1
         processed = processStandardTex(line[num:].strip()).strip()
         if num is 1:
-            newLine = "{\\Huge "+processed+"}\\\\"
+            newLine = "\n\\chapter{"+processed+"}"
         elif num is 2:
-            newLine = "{\\LARGE "+processed+"}\\\\"
+            newLine = "\n\\section{"+processed+"}"
         elif num is 3:
-            newLine = "{\\Large "+processed+"}\\\\"
+            newLine = "\n\\subsection{"+processed+"}"
         elif num >= 4:
-            newLine = "{\\large "+processed+"}\\\\"
+            newLine = "\n\\label{"+processed+"}"
             
     return isHeader, newLine
 
@@ -231,6 +265,13 @@ def checkBlockQuoteTex(line):
     if line.startswith('> '):
         isBlockQuote = True
         processed = processStandardTex(line[1:].strip()).strip()
+        # print("PROCESSED: ", processed)
+        # leftBracket = line[1:].find("[")
+        # rightBracket = line[1:].find("]")
+        # leftParen = line[1:].find("(")
+        # rightParen = line[1:].find(")")
+        # print(f"lb {leftBracket} rb {rightBracket} lp {leftParen} rp {rightParen}")
+
         newLine = "\n\\begin{quote}\n" + processed + "\n\\end{quote}"
     return isBlockQuote, newLine
 
@@ -253,6 +294,42 @@ def checkListTex(line):
             newLine = "\\begin{enumerate} \\setcounter{enumi}{"+str(int(num)-1)+"} \\item "+ processed +"\\end{enumerate}"
     return isList, newLine
 
+def checkCodeTex(line):
+    isCode = False
+    newLine = ""
+    if line.startswith('```'):
+        isCode = True
+        global inCodeBlock
+        if inCodeBlock:
+            inCodeBlock = False
+        else:
+            inCodeBlock = True
+        if inCodeBlock:
+            lang = line[3:].strip().lower()
+            if lang in markdownToTexLangs.keys():
+                newLine = "\\begin{lstlisting}[language=" + markdownToTexLangs[lang] + "]"
+            else:
+                newLine = "\\begin{lstlisting}[language=C]"
+        else:
+            newLine = "\\end{lstlisting}"
+    return isCode, newLine
+
+def checkMultilineComment(line):
+    global inCommentBlock
+    global mustFinishComment
+    isComment = False
+    newLine = ""
+    if line.startswith('<!--'):
+        isComment = True
+        inCommentBlock = True
+    if inCommentBlock:
+        newLine = "% " + line
+        if line.find("-->") is not -1:
+            inCommentBlock = False
+            mustFinishComment = True
+            newLine = "% " + line[0:line.find("-->") + 3] + "\n" +  line[line.find("-->")+3:]
+    return isComment, newLine
+
 def processNewPageTex(line):
     isNewLine = False
     newLine = ""
@@ -262,9 +339,16 @@ def processNewPageTex(line):
     return isNewLine, newLine
 
 def processStandardTex(line):
+    global inCommentBlock
     newLine = line
     if line.startswith("@@ "):
         newLine = "\\indent " + newLine[3:]
+
+    if line.find("<!--") is not -1 and line.find("-->") > line.find("<!--"):
+        if inCommentBlock:
+            inCommentBlock = False
+        newLine = newLine[0:line.find("<!--")] + newLine[line.find("-->") + 3:]
+
     while newLine.find("**") is not -1:
         boldLoc = newLine.find("**")
         if boldLoc is not -1:    #asterisks exists
@@ -272,8 +356,22 @@ def processStandardTex(line):
             if boldLoc2 is not -1:
                 newLine = newLine[0:boldLoc] + "\\textbf{"+newLine[boldLoc+2 : boldLoc2] +"}"+ newLine[boldLoc2+2:]
 
+    while newLine.find("`") is not -1:
+        codeLoc = newLine.find("`")
+        if codeLoc is not -1:    #backtick exists
+            codeLoc2 = codeLoc + 1 + newLine[codeLoc+1:].find("`")
+            if codeLoc2 is not -1:
+                newLine = newLine[0:codeLoc] + "\\texttt{"+newLine[codeLoc+1 : codeLoc2].replace('\\', '\\textbackslash ').replace("$", "\$").replace("_", "<CODEUNDER>").replace("*", "<CODEAST>") +"}"+ newLine[codeLoc2+1:]   
+
     while newLine.find("*") is not -1:
         itLoc = newLine.find("*")
+        if itLoc is not -1:    #asterisk exists
+            itLoc2 = itLoc + 1 + newLine[itLoc+1:].find("*")
+            if itLoc2 is not -1:
+                newLine = newLine[0:itLoc] + "\\textit{"+newLine[itLoc+1 : itLoc2] +"}"+ newLine[itLoc2+1:]    
+    
+    while newLine.find("_") is not -1:
+        itLoc = newLine.find("_")
         if itLoc is not -1:    #asterisk exists
             itLoc2 = itLoc + 1 + newLine[itLoc+1:].find("*")
             if itLoc2 is not -1:
@@ -303,49 +401,72 @@ def processStandardTex(line):
         for i in range(len(ampInds), 0, -1):
             newLine = newLine[:ampInds[i-1]-1]+' \\& '+newLine[ampInds[i-1]+2:].lstrip()
 
-    leftParen = newLine.find("(")
-    rightParen = newLine.find(")")
-    leftBracket = newLine.find("[")
-    rightBracket = newLine.find("]")
-    while leftParen is not -1 and rightParen is not -1 and leftBracket is not -1 and rightBracket is not -1 and leftBracket < rightBracket and rightBracket < leftParen and leftParen < rightParen and leftParen-1 is rightBracket:         
-        leftParen = newLine.find("(")
-        rightParen = newLine.find(")")
-        leftBracket = newLine.find("[")
-        rightBracket = newLine.find("]")
-        if leftParen is not -1 and rightParen is not -1 and leftBracket is not -1 and rightBracket is not -1:
-            if leftBracket < rightBracket and rightBracket < leftParen and leftParen < rightParen and leftParen-1 is rightBracket:
-                text = newLine[leftBracket+1:rightBracket]
-                href = newLine[leftParen+1:rightParen]
-                newLine = newLine[:leftBracket]+"\\href{"+href+"}{"+text+"}"+newLine[rightParen+1:]
-    # return newLine+"\\\\"
-    return "\n" + newLine
+    linkInd = newLine.find("](")
+    while linkInd != -1:
+        leftBracket = newLine.rfind("[", 0, linkInd + 1)
+        rightParen = newLine.find(")", linkInd)
+        text = newLine[leftBracket+1:linkInd]
+        href = newLine[linkInd+2:rightParen]
+        newLine = newLine[:leftBracket]+"\\href{"+href+"}{"+text+"}"+newLine[rightParen+1:]
+        linkInd = newLine.find("](")
+
+    return "\n" + newLine.replace("<CODEAST>", "*").replace("<CODEUNDER>", "\\_")
 
 
 
 
 def upperBoilerPlateTex():
     res = ""
-    res+="\\documentclass[12pt]{article}\n"
-    res+="\\usepackage[margin=1in]{geometry}\n"
-    res+="\\usepackage{setspace}\n"
-    res+="\\usepackage[leftmargin = 1in, rightmargin = 0in, vskip = 0in]{quoting}\n"
-    res+="\\usepackage{microtype}\n"
-    res+="\\usepackage{amssymb, amsthm, amsmath, amsfonts}\n"
-    res+="\\usepackage{ wasysym }\n"
-    res+="\\usepackage{graphicx}\n"
-    res+="\\usepackage{color}\n"
-    res+="\\usepackage{hyperref}\n"
-    res+="\\newcommand{\\blockquotespacing}{\\blockspaced}\n"
-    res+="\\newcommand{\\prose}{.25in}\n"
-    res+="\\newcommand{\\poetry}{0in}\n"
-    res+="\\newcommand{\\singlespaced}{\\setstretch{1}\\vspace{\\baselineskip}}\n"
-    res+="\\newcommand{\\blockspaced}{\\setstretch{1.3}\\vspace{\\baselineskip}}\n"
-    res+="\\newcommand{\\doublespaced}{}\n"
-    res+="\\newenvironment{blockquote}[1][\\prose]{\\setlength{\\parindent}{#1}\\begin{quoting}\\blockquotespacing}{\\end{quoting}}\n"
-    res+="\\begin{document}\n"
-    res+="\\setstretch{2}\n"
-    # res+="\\raggedright\n"
-    res+="\\noindent\n"
+    res += "\\documentclass[11pt, twoside, reqno]{book}\n"
+    res += "\\usepackage{amssymb, amsthm, amsmath, amsfonts}\n"
+    res += "\\usepackage[htt]{hyphenat}\n"
+    res += "\\usepackage{graphicx}\n"
+    res += "\\usepackage{color}\n"
+    res += "\\usepackage{hyperref}\n"
+    res += "\\usepackage{verbatim}\n"
+    res += "\\usepackage{ wasysym }\n"
+    res += "\\usepackage[toc,page]{appendix}\n"
+    res += "\\appendixpageoff\n"
+    res += "\\usepackage[leftmargin = 1in, rightmargin = 0in, vskip = 0in]{quoting}\n"
+    res += "\\usepackage{microtype}\n"
+    res += "\\usepackage{bardtex}\n"
+    res += "\\biboption{amsrefs}\n"
+    res += "\\styleoption{seniorproject}\n"
+    res+="\\usepackage{listings}\n"
+    res+="\\definecolor{codegreen}{rgb}{0,0.6,0}\n"
+    res+="\\definecolor{codegray}{rgb}{0.5,0.5,0.5}\n"
+    res+="\\definecolor{codepurple}{rgb}{0.58,0,0.82}\n"
+    res+="\\definecolor{backcolour}{rgb}{0.95,0.95,0.98}\n"
+    res+="\\lstdefinestyle{mystyle}{\n"
+    res+="    commentstyle=\\color{codegreen},\n"
+    res+="    keywordstyle=\\color{magenta},\n"
+    res+="    stringstyle=\\color{codepurple},\n"
+    res+="    basicstyle=\\ttfamily\\footnotesize,\n"
+    res+="    backgroundcolor=\\color{backcolour},\n"
+    res+="    frame=lrbt,\n"
+    res+="    breakatwhitespace=false,      \n"
+    res+="    framexleftmargin=8pt, \n"
+    res+="    framexrightmargin=8pt,   \n"
+    res+="    framextopmargin=6pt,\n"
+    res+="    framexbottommargin=6pt,\n"
+    res+="    breaklines=true,                 \n"
+    res+="    keepspaces=false,                 \n"
+    res+="    numbersep=0pt,                  \n"
+    res+="    showspaces=false,                \n"
+    res+="    showstringspaces=false,\n"
+    res+="    showtabs=false,                  \n"
+    res+="    tabsize=1\n"
+    res+="}\n"
+    res+="\\lstset{style=mystyle}\n"
+    res += "\\newcommand{\\blockquotespacing}{\\blockspaced}\n"
+    res += "\\newcommand{\\prose}{.25in}\n"
+    res += "\\newcommand{\\poetry}{0in}\n"
+    res += "\\newcommand{\\singlespaced}{\\setstretch{1}\\vspace{\\baselineskip}}\n"
+    res += "\\newcommand{\\blockspaced}{\\setstretch{1.3}\\vspace{\\baselineskip}}\n"
+    res += "\\newcommand{\\doublespaced}{}\n"
+    res += "\\newenvironment{blockquote}[1][\\prose]{\\setlength{\\parindent}{#1}\\begin{quoting}\\blockquotespacing}{\\end{quoting}}\n"
+    res += "\\begin{document}\n"
+    res += "\\startmain"
     return res
 
 def lowerBoilerPlateTex():
@@ -401,16 +522,30 @@ def writeHTML():
 
 
 def writeTex():
+    global mustFinishComment
     with open(mdname) as f: #read in file
         for line in f.readlines():
+            originalLine = line
             line = line.strip() #remove whitespace
             if line is not '':
                 newLine = line
+                isCode, codeLine = checkCodeTex(line)
+                _, commentLine = checkMultilineComment(line)
                 isHeader, headLine = checkHeaderTex(line)
                 isList, listLine = checkListTex(line)
                 isBlockQuote, blockQuoteLine = checkBlockQuoteTex(line)
                 isNewPage, newPageLine = processNewPageTex(line)
-                if isHeader:
+                if isCode:
+                    newLine = codeLine
+                elif inCodeBlock:
+                    newLine = originalLine[:-1]
+                    newLine = newLine
+                elif inCommentBlock:
+                    newLine = commentLine
+                elif mustFinishComment:
+                    mustFinishComment = False
+                    newLine = commentLine
+                elif isHeader:
                     newLine = headLine
                 elif isList:
                     newLine = listLine

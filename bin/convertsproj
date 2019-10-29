@@ -1,0 +1,36 @@
+#!/bin/bash
+# Markdown to html and tex converter
+
+helpConvertSproj(){
+    echo "Markdown to html and latex converter!"
+    echo -e "Directory must have file DIRNAME/DIRNAME.md\nTo run:\t\tpython mdTex.py DIRNAME"
+}
+
+if [ "$#" -ne 1 ]; then
+    helpConvertSproj
+    else
+    if [ $1 != "-h" ] && [ $1 != "--help" ]; then
+        if [ $1 == "." ]; then
+                dirName="$(basename $PWD)"
+                mkdir -p tex
+                mkdir -p web
+                mdConvertSproj.py $dirName current
+                mv $dirName.tex tex
+                mv $dirName.html web
+                mv markdown.css web
+                pdflatex -output-directory=tex $dirName.tex > tex/pdflatexoutput.txt
+                cp tex/$dirName.pdf .
+            else
+                mkdir -p $1/tex
+                mkdir -p $1/web
+                mdConvertSproj.py $1
+                mv $1/$1.tex tex
+                mv $1/$1.html web
+                mv $1/markdown.css web
+                pdflatex -output-directory=$1/tex $1/$1.tex > $1/tex/pdflatexoutput.txt
+                cp $1/tex/$1.pdf $1
+        fi
+        else
+        helpConvertSproj
+    fi
+fi
