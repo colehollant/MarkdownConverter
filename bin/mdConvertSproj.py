@@ -265,13 +265,6 @@ def checkBlockQuoteTex(line):
     if line.startswith('> '):
         isBlockQuote = True
         processed = processStandardTex(line[1:].strip()).strip()
-        # print("PROCESSED: ", processed)
-        # leftBracket = line[1:].find("[")
-        # rightBracket = line[1:].find("]")
-        # leftParen = line[1:].find("(")
-        # rightParen = line[1:].find(")")
-        # print(f"lb {leftBracket} rb {rightBracket} lp {leftParen} rp {rightParen}")
-
         newLine = "\n\\begin{quote}\n" + processed + "\n\\end{quote}"
     return isBlockQuote, newLine
 
@@ -341,6 +334,10 @@ def processNewPageTex(line):
 def processStandardTex(line):
     global inCommentBlock
     newLine = line
+
+    if line.startswith("___"):
+        return "\n"
+
     if line.startswith("@@ "):
         newLine = "\\indent " + newLine[3:]
 
@@ -349,12 +346,14 @@ def processStandardTex(line):
             inCommentBlock = False
         newLine = newLine[0:line.find("<!--")] + newLine[line.find("-->") + 3:]
 
-    while newLine.find("**") is not -1:
-        boldLoc = newLine.find("**")
-        if boldLoc is not -1:    #asterisks exists
-            boldLoc2 = boldLoc + 2 + newLine[boldLoc+2:].find("**")
-            if boldLoc2 is not -1:
-                newLine = newLine[0:boldLoc] + "\\textbf{"+newLine[boldLoc+2 : boldLoc2] +"}"+ newLine[boldLoc2+2:]
+    linkInd = newLine.find("](")
+    while linkInd != -1:
+        leftBracket = newLine.rfind("[", 0, linkInd + 1)
+        rightParen = newLine.find(")", linkInd)
+        text = newLine[leftBracket+1:linkInd]
+        href = newLine[linkInd+2:rightParen].replace("_", "<HREFUNDER>").replace("*", "<HREFAST>")
+        newLine = newLine[:leftBracket]+"\\href{"+href+"}{"+text+"}"+newLine[rightParen+1:]
+        linkInd = newLine.find("](")
 
     while newLine.find("`") is not -1:
         codeLoc = newLine.find("`")
@@ -363,6 +362,13 @@ def processStandardTex(line):
             if codeLoc2 is not -1:
                 newLine = newLine[0:codeLoc] + "\\texttt{"+newLine[codeLoc+1 : codeLoc2].replace('\\', '\\textbackslash ').replace("$", "\$").replace("_", "<CODEUNDER>").replace("*", "<CODEAST>") +"}"+ newLine[codeLoc2+1:]   
 
+    while newLine.find("**") is not -1:
+        boldLoc = newLine.find("**")
+        if boldLoc is not -1:    #asterisks exists
+            boldLoc2 = boldLoc + 2 + newLine[boldLoc+2:].find("**")
+            if boldLoc2 is not -1:
+                newLine = newLine[0:boldLoc] + "\\textbf{"+newLine[boldLoc+2 : boldLoc2] +"}"+ newLine[boldLoc2+2:]
+    
     while newLine.find("*") is not -1:
         itLoc = newLine.find("*")
         if itLoc is not -1:    #asterisk exists
@@ -395,22 +401,12 @@ def processStandardTex(line):
         for i in range(len(squareInds), 0, -1):
             newLine = newLine[:squareInds[i-1]]+" \\hfill "+newLine[squareInds[i-1]:].lstrip()
 
-
     ampInds = findAll(newLine, "&")
     if ampInds:
         for i in range(len(ampInds), 0, -1):
             newLine = newLine[:ampInds[i-1]-1]+' \\& '+newLine[ampInds[i-1]+2:].lstrip()
 
-    linkInd = newLine.find("](")
-    while linkInd != -1:
-        leftBracket = newLine.rfind("[", 0, linkInd + 1)
-        rightParen = newLine.find(")", linkInd)
-        text = newLine[leftBracket+1:linkInd]
-        href = newLine[linkInd+2:rightParen]
-        newLine = newLine[:leftBracket]+"\\href{"+href+"}{"+text+"}"+newLine[rightParen+1:]
-        linkInd = newLine.find("](")
-
-    return "\n" + newLine.replace("<CODEAST>", "*").replace("<CODEUNDER>", "\\_")
+    return "\n" + newLine.replace("<CODEAST>", "*").replace("<CODEUNDER>", "\\_").replace("<HREFUNDER>", "_").replace("<HREFAST>", "*")
 
 
 
